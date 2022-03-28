@@ -1,5 +1,4 @@
 import serial.tools.list_ports
-import random
 import time
 import sys
 from Adafruit_IO import MQTTClient
@@ -21,18 +20,19 @@ cred = credentials.Certificate("./serviceAccountKey.json")
 default_app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-collection_ref = db.collection(u'garden')
-
-document_ref = {
-    'light': collection_ref.document(u'light'),
-    'pump': collection_ref.document(u'pump'),
-    'temp': collection_ref.document(u'temp'),
-    'humid': collection_ref.document(u'humid'),
-    'soil_moisture': collection_ref.document(u'soil_moisture'),
+collection_ref = { 
+    'light_data': db.collection(u'light_data'),
+    'humid_data': db.collection(u'humid_data'),
+    'temperature_data': db.collection(u'temperature_data'),
+    'soil_moisture_data': db.collection(u'soil_moisture_data'),
+    'sensors': db.collection(u'sensors'),
 }
 
-doc_light_ref = collection_ref.document(u'light')
-doc_pump_ref = collection_ref.document(u'pump')
+document_ref = {
+    'pump': db.collection(u'sensors').document(u'pump'),
+    'light': db.collection(u'sensors').document(u'light'),
+}
+
 callback_done = Event()
 
 def getPort():
@@ -87,21 +87,31 @@ client.on_subscribe = subscribe
 client.connect()
 client.loop_background()
 
-# ser = serial.Serial(port=getPort(), baudrate=115200)
+ser = serial.Serial(port=getPort(), baudrate=115200)
 
 def processData(data):
     data = data.replace("!", "")
     data = data.replace("#", "")
     splitData = data.split(":")
     print(splitData)
+    push_data = splitData[2]
     try: 
         match splitData[1]:
             case "TEMP":
-                client.publish(AIO_FEED_IDS[0], splitData[2])
+                client.publish(AIO_FEED_IDS[0], push_data)
+                collection_ref['light_data'].add({
+                    'value': push_data
+                })
             case  "HUMI":
                 client.publish(AIO_FEED_IDS[1], splitData[2])
+                collection_ref['humid_data'].add({
+                    'value': push_data
+                })
             case "SOIL":
                 client.publish(AIO_FEED_IDS[2], splitData[2])
+                collection_ref['soil_moisture_data'].add({
+                    'value': push_data
+                })
     except:
         pass
 
@@ -122,32 +132,29 @@ def readSerial():
                 mess = mess[end+1:]
 
 def on_snapshot_light(doc_snapshot, changes, read_time):
-    ...
+    state = 'ON'
+    for doc in doc_snapshot:
+        state = doc.to_dict().get('state')
+    try:
+        ser.write(bytes(f"!1:LED:L{state}#", "UTF8"))
+    except:
+        print("Write failed")
 
 def on_snapshot_pump(doc_snapshot, changes, read_time):
-    ...
-
-def on_snapshot_temp(doc_snapshot, changes, read_time):
-    ...
-
-def on_snapshot_humid(doc_snapshot, changes, read_time):
-    ...
-
-def on_snapshot_soil_moisture(doc_snapshot, changes, read_time):
-    ...
+    state = 'ON'
+    for doc in doc_snapshot:
+        state = doc.to_dict().get('state')
+    try:
+        ser.write(bytes(f"!1:PUMP:P{state}#", "UTF8"))
+    except:
+        print("Write failed")
 
 def firebase_watcher():
-    document_ref_light = document_ref['light'].on_snapshot(on_snapshot_light)
-    document_ref_pump = document_ref['pump'].on_snapshot(on_snapshot_pump)
-    document_ref_temp = document_ref['temp'].on_snapshot(on_snapshot_temp)
-    document_ref_humid = document_ref['humid'].on_snapshot(on_snapshot_humid)
-    document_ref_soil_moisture = document_ref['soil_moisture'].on_snapshot(on_snapshot_soil_moisture)
+    light_sensor_snapshot = document_ref['light'].on_snapshot(on_snapshot_light)
+    pump_sensor_snapshot = document_ref['pump'].on_snapshot(on_snapshot_pump)
     callback_done.wait()
-    document_ref_light.unsubscribe()
-    document_ref_pump.unsubscribe()
-    document_ref_temp.unsubscribe()
-    document_ref_humid.unsubscribe()
-    document_ref_soil_moisture.unsubscribe()
+    light_sensor_snapshot.unsubscribe()
+    pump_sensor_snapshot.unsubscribe()
 
 
 def main():
