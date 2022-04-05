@@ -1,10 +1,13 @@
 import serial.tools.list_ports
 import time
 import sys
-from Adafruit_IO import MQTTClient
+from Adafruit_IO import MQTTClient, Client, Data
 from threading import Thread, Event
 import firebase_admin
 from firebase_admin import credentials, firestore
+import requests
+import json
+from time import sleep
 
 AIO_FEED_IDS = [
     "microbit-temp",
@@ -14,7 +17,9 @@ AIO_FEED_IDS = [
     "microbit-light"
 ]
 AIO_USERNAME = "Long1961"
-AIO_KEY = "aio_vMTK73e02oXT1R7040dDIDW0Bmoq"
+AIO_KEY = "aio_whrR18HSoEZGxO5FJTA0UPgiO3no"
+
+aio_client = Client(AIO_USERNAME, AIO_KEY)
 
 cred = credentials.Certificate("./serviceAccountKey.json")
 default_app = firebase_admin.initialize_app(cred)
@@ -85,9 +90,7 @@ client.on_disconnect = disconnected
 client.on_message = message
 client.on_subscribe = subscribe
 client.connect()
-client.loop_background()
-
-ser = serial.Serial(port=getPort(), baudrate=115200)
+# client.loop_background()
 
 def processData(data):
     data = data.replace("!", "")
@@ -103,12 +106,12 @@ def processData(data):
                     'value': push_data
                 })
             case  "HUMI":
-                client.publish(AIO_FEED_IDS[1], splitData[2])
+                client.publish(AIO_FEED_IDS[1], push_data)
                 collection_ref['humid_data'].add({
                     'value': push_data
                 })
             case "SOIL":
-                client.publish(AIO_FEED_IDS[2], splitData[2])
+                client.publish(AIO_FEED_IDS[2], push_data)
                 collection_ref['soil_moisture_data'].add({
                     'value': push_data
                 })
@@ -140,14 +143,27 @@ def on_snapshot_light(doc_snapshot, changes, read_time):
     except:
         print("Write failed")
 
+flag = False
 def on_snapshot_pump(doc_snapshot, changes, read_time):
+    global flag
     state = 'ON'
     for doc in doc_snapshot:
         state = doc.to_dict().get('state')
     try:
-        ser.write(bytes(f"!1:PUMP:P{state}#", "UTF8"))
+        flag = True
+        requests.post(
+            f'https://io.adafruit.com/api/v2/{AIO_USERNAME}/feeds/{AIO_FEED_IDS[3]}/data',
+            headers={
+                "X-AIO-Key": AIO_KEY,
+            },
+            data={
+                "value": "2" if state == "OFF" else "3"
+            }
+        )
     except:
         print("Write failed")
+    finally:
+        flag = False
 
 def firebase_watcher():
     light_sensor_snapshot = document_ref['light'].on_snapshot(on_snapshot_light)
@@ -156,9 +172,25 @@ def firebase_watcher():
     light_sensor_snapshot.unsubscribe()
     pump_sensor_snapshot.unsubscribe()
 
+def pump_feed_watcher():
+    current_value = "0"
+    while True:
+        sleep(2)
+        while flag:
+            ...
+        x = requests.get(f'https://io.adafruit.com/api/v2/{AIO_USERNAME}/feeds/{AIO_FEED_IDS[3]}/data?limit=1', headers={
+            "X-AIO-Key": AIO_KEY
+        })
+        value = json.loads(x.text)[0]['value']
+        if current_value == value:
+            continue
+        current_value = value
+        document_ref['pump'].update({ 'state': "ON" if value == "3" else "OFF" })
+        print(value)
 
 def main():
     Thread(target=firebase_watcher).start()
+    Thread(target=pump_feed_watcher).start()
     while True:
         if isMicrobitConnected:
             readSerial()
