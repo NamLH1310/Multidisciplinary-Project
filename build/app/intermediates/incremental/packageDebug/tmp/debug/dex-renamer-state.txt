@@ -1,0 +1,4 @@
+#Mon Mar 28 11:16:10 ICT 2022
+base.0=/home/namle/programming/multidisciplinary_project_se/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex
