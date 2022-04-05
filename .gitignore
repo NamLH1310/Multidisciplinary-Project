@@ -50,6 +50,7 @@ analysis_benchmark.json
 .pub-cache/
 .pub/
 /build/
+.dll.pdb
 
 # packages file containing multi-root paths
 .packages.generated
