@@ -25,7 +25,7 @@ serviceAccountKey*
 .vscode/
 
 # Flutter repo-specific
-/build/
+build/
 /bin/cache/
 /bin/internal/bootstrap.bat
 /bin/internal/bootstrap.sh
@@ -52,6 +52,7 @@ analysis_benchmark.json
 .pub/
 /build/
 .dll.pdb
+windows/
 
 # packages file containing multi-root paths
 .packages.generated
