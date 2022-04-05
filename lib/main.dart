@@ -5,7 +5,7 @@ import 'graph_load.dart';
 import 'package:http/http.dart' as http;
 import 'wide_scr.dart';
 
-void main() => runApp( name(title:"Plant"));
+void main() => runApp(name(title: "Plant"));
 const String user_name = "";
 const user_key = "";
 const api =
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       //home: const MyHomePage(title: 'Plant Monitor Planing'),
-      home: graphDisplay(name_type: "Celcious ",type:"Temperature covering"),
+      home: graphDisplay(name_type: "Celcious ", type: "Temperature covering"),
     );
   }
 }
