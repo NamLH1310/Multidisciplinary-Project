@@ -1,81 +1,26 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'graph_load.dart';
-import 'package:http/http.dart' as http;
-import 'wide_scr.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'screens/home_screen.dart';
 
-void main() => runApp(name(title: "Plant"));
-const String user_name = "";
-const user_key = "";
-const api =
-    "https://io.adafruit.com/api/v2/BKHai/feeds/bbc-temp"; //thay cho nay
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Plant',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      //home: const MyHomePage(title: 'Plant Monitor Planing'),
-      home: graphDisplay(name_type: "Celcious ", type: "Temperature covering"),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  late Future<Album> futureAlbm;
-  int _counter = 0;
-  @override
-  void initState() {
-    super.initState();
-    futureAlbm = fetchAlbum();
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
+    return MaterialApp(initialRoute: '/', routes: {
+      '/': (context) => const HomeScreen(),
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text(widget.title)),
-      ),
-      body: Center(
-          child: FutureBuilder<Album>(
-        future: futureAlbm,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Text(snapshot.data!.Name);
-          } else {
-            return Text('${snapshot.error}');
-          }
-          return const CircularProgressIndicator();
-        },
-      )),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
   }
 }
 
