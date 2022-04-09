@@ -225,11 +225,7 @@ packages:
     source: hosted
     version: "1.1.0"
   syncfusion_flutter_charts:
-<<<<<<< HEAD
-    dependency: "direct dev"
-=======
     dependency: "direct main"
->>>>>>> 4a2fc5e42f165d6472ffe756d3a8f54110ea8684
     description:
       name: syncfusion_flutter_charts
       url: "https://pub.dartlang.org"

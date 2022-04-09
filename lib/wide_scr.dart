@@ -23,10 +23,10 @@ class _layOutState extends State<layOut> {
       children: [
         Expanded(
           flex: 1,
-          child:  SizedBox(child: graphDisplay(name_type: name_type[0], type: type[0]),height:size.height/3,width: size.height/3,) ,
+          child:  SizedBox(child: GraphDisplay(nameType: name_type[0], type: type[0]),height:size.height/3,width: size.height/3,) ,
         ),
         Expanded(
-          child: SizedBox(child: graphDisplay(name_type: name_type[1], type: type[1]),height:size.height/3,width: size.height/3,) ,
+          child: SizedBox(child: GraphDisplay(nameType: name_type[1], type: type[1]),height:size.height/3,width: size.height/3,) ,
             //mainAxisAlignment: MainAxisAlignment.center,
           
           flex: 1,
