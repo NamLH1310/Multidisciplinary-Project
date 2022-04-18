@@ -21,22 +21,25 @@ class _DeviceControllerState extends State<DeviceController> {
   final Map<String, String> sensors = {};
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
     getSensors();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Device Controller")),
       drawer: const MenuDrawer(),
       body: Column(
         children: <Widget>[
-          SensorSwitchButton(
+          sensorSwitchButton(
             collectionName: "sensors",
             documentName: "pump",
-            state: sensors["pump"],
           ),
-          SensorSwitchButton(
+          sensorSwitchButton(
             collectionName: "sensors",
             documentName: "led",
-            state: sensors["led"],
           ),
         ],
       ),
@@ -51,54 +54,82 @@ class _DeviceControllerState extends State<DeviceController> {
     }
     setState(() {});
   }
-}
 
-class SensorSwitchButton extends StatefulWidget {
-  final String collectionName;
-  final String documentName;
-  final String? state;
-  const SensorSwitchButton(
-      {Key? key,
-      this.collectionName = "",
-      this.documentName = "",
-      this.state = ""})
-      : super(key: key);
-
-  @override
-  State<SensorSwitchButton> createState() => _SensorSwitchButtonState();
-}
-
-class _SensorSwitchButtonState extends State<SensorSwitchButton> {
-  @override
-  Widget build(BuildContext context) {
-    bool currentState = (widget.state == "ON");
+  Widget sensorSwitchButton({
+    required String collectionName,
+    required String documentName,
+  }) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Expanded(
-          flex: 8,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(widget.documentName.capitalize(),
-                style: const TextStyle(fontSize: 18)),
-          ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(documentName.capitalize(),
+              style: const TextStyle(fontSize: 18)),
         ),
-        Expanded(
-          flex: 2,
-          child: Center(
-            child: Switch(
-              value: currentState,
-              onChanged: (value) {
-                firestore
-                    .collection(widget.collectionName)
-                    .doc(widget.documentName)
-                    .update({"state": value ? "ON" : "OFF"});
-                currentState = value;
-                setState(() {});
-              },
-            ),
+        Center(
+          child: Switch(
+            value: sensors[documentName] == "ON",
+            onChanged: (value) {
+              firestore
+                  .collection(collectionName)
+                  .doc(documentName)
+                  .update({"state": value ? "ON" : "OFF"});
+              sensors[documentName] = value ? "ON" : "OFF";
+              setState(() {});
+            },
           ),
         ),
       ],
     );
   }
 }
+
+// class SensorSwitchButton extends StatefulWidget {
+//   final String collectionName;
+//   final String documentName;
+//   final String? state;
+//   const SensorSwitchButton(
+//       {Key? key,
+//       this.collectionName = "",
+//       this.documentName = "",
+//       this.state = ""})
+//       : super(key: key);
+
+//   @override
+//   State<SensorSwitchButton> createState() => _SensorSwitchButtonState();
+// }
+
+// class _SensorSwitchButtonState extends State<SensorSwitchButton> {
+//   late bool currentState;
+//   bool flag = true;
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//       crossAxisAlignment: CrossAxisAlignment.center,
+//       children: <Widget>[
+//         Padding(
+//           padding: const EdgeInsets.all(8.0),
+//           child: Text(widget.documentName.capitalize(),
+//               style: const TextStyle(fontSize: 18)),
+//         ),
+//         Center(
+//           child: Switch(
+//             value: currentState,
+//             onChanged: (value) {
+//               firestore
+//                   .collection(widget.collectionName)
+//                   .doc(widget.documentName)
+//                   .update({"state": value ? "ON" : "OFF"});
+//               currentState = !currentState;
+//               setState(() {});
+//             },
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }

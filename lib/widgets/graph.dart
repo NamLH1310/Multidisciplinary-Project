@@ -23,8 +23,13 @@ class _GraphDisplayState extends State<GraphDisplay> {
   List<DataInput> _chartData = [];
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
     getData();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SfCartesianChart(
       title: ChartTitle(
         text: widget.dataName,
