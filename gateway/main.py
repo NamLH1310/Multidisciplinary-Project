@@ -1,3 +1,5 @@
+from datetime import datetime
+from random import random, randint
 import serial.tools.list_ports
 import sys
 from Adafruit_IO import MQTTClient
@@ -51,7 +53,7 @@ def getPort():
         strPort = str(port)
         if "USB Serial Device" in strPort:
             splitPort = strPort.split(" ")
-            commPort = (splitPort[0])
+            commPort = splitPort[0]
     return commPort
 
 isMicrobitConnected = False
@@ -100,32 +102,42 @@ def processData(data):
         if splitData[1] == "TEMP":
             client.publish("microbit-temp", splitData[2])
             collection_ref['temperature_data'].add({
-                'value': push_data
+                'createAt': datetime.now(),
+                'value': push_data,
             })
         elif splitData[1] == "HUMI":
             client.publish("microbit-humid", splitData[2])
             collection_ref['humid_data'].add({
-                'value': push_data
+                'createAt': datetime.now(),
+                'value': push_data,
             })
         elif splitData[1] == "SOIL":
             client.publish("microbit-soil-moisture", splitData[2])
             collection_ref['soil_moisture_data'].add({
-                'value': push_data
+                'createAt': datetime.now(),
+                'value': push_data,
             })
         elif splitData[1] == "CO2":
             client.publish("microbit-co2", splitData[2])
             collection_ref['co2_data'].add({
-                'value': push_data
+                'createAt': datetime.now(),
+                'value': push_data,
             })
         elif splitData[1] == "LIGHT":
             client.publish("microbit-light", splitData[2])
             collection_ref['light_data'].add({
-                'value': push_data
+                'createAt': datetime.now(),
+                'value': push_data,
             })  
         elif splitData[1] == "PUMP":
             client.publish("microbit-pump", splitData[2])
             document_ref['pump'].update({
-                'state': 'ON' if(splitData[2] == '3') else 'OFF'
+                'state': 'ON' if splitData[2] == '3' else 'OFF'
+            })  
+        elif splitData[1] == "LED":
+            client.publish("microbit-led", splitData[2])
+            document_ref['pump'].update({
+                'state': 'ON' if splitData[2] == '3' else 'OFF'
             })  
     except IndexError:
         print("Read failed")
@@ -155,7 +167,12 @@ def on_snapshot_led(doc_snapshot, changes, read_time):
     for doc in doc_snapshot:
         state = doc.to_dict().get('state')
     try:
-        ser.write(f"{1 if state == 'ON' else 0}#".encode())
+        post(
+            f'https://io.adafruit.com/api/v2/{AIO_USERNAME}/feeds/{AIO_FEED_IDS[6]}/data',
+            headers={ "X-AIO-Key": AIO_KEY, },
+            data={ "value": "2" if state == "OFF" else "3" }
+        )
+        # ser.write(f"{1 if state == 'ON' else 0}#".encode())
     except Exception as e:
         print(e)
 
@@ -172,8 +189,8 @@ def on_snapshot_pump(doc_snapshot, changes, read_time):
             headers={ "X-AIO-Key": AIO_KEY, },
             data={ "value": "2" if state == "OFF" else "3" }
         )
-    except:
-        print("Write failed")
+    except Exception as e:
+        print(e)
     finally:
         flag = False
 
@@ -215,4 +232,10 @@ def main():
         sleep(2)
 
 if __name__ == "__main__":
+    # for i in range(0, 30):
+    # collection_ref['humid_data'].add({
+    #     'createAt': datetime.now(),
+    #     'value': randint(49, 77),
+    # })
+    # exit(0)
     main()

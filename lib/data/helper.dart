@@ -10,19 +10,21 @@ class CollectionRef {
   Future<List<DataInput>> getData() async {
     try {
       final collectionRef = firestore.collection(collectionName);
-      QuerySnapshot<Map<String, dynamic>> docSnapshots =
-          await collectionRef.limit(limit).get();
+      final docSnapshots = await collectionRef
+          .limit(limit)
+          .orderBy("createAt", descending: true)
+          .get();
       final List<DataInput> data = [];
-      for (int i = 0; i < docSnapshots.docs.length; i++) {
+      for (int i = docSnapshots.docs.length - 1; i >= 0; i--) {
         data.add(DataInput(
             x: i.toDouble(),
-            y: double.parse(docSnapshots.docs[i].data()["value"])));
+            y: (docSnapshots.docs[i].data()["value"] as int).toDouble()));
       }
       return data;
     } on FirebaseException catch (error) {
       debugPrint("Firestore excetption: ${error.message}");
     } catch (error) {
-      debugPrint("$error");
+      debugPrint("Helper.dart: $error");
     }
     return [];
   }

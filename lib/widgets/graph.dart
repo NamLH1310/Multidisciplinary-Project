@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
@@ -21,10 +22,12 @@ class _GraphDisplayState extends State<GraphDisplay> {
   _GraphDisplayState() : super();
 
   List<DataInput> _chartData = [];
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
-    getData();
+    // getData();
+    checkForChanges();
     super.initState();
   }
 
@@ -45,7 +48,7 @@ class _GraphDisplayState extends State<GraphDisplay> {
       primaryYAxis: NumericAxis(
         numberFormat: NumberFormat.decimalPattern('en_us'),
         labelFormat: '{value}',
-        title: AxisTitle(text: "Co2 value (${widget.dataUnit})"),
+        title: AxisTitle(text: "${widget.dataName} (${widget.dataUnit})"),
       ),
       primaryXAxis: NumericAxis(
         numberFormat: NumberFormat.decimalPattern('en_us'),
@@ -63,5 +66,14 @@ class _GraphDisplayState extends State<GraphDisplay> {
     } catch (error) {
       debugPrint("$error");
     }
+  }
+
+  checkForChanges() async {
+    firestore.collection(widget.collectionName).snapshots().listen(
+      (event) {
+        debugPrint("${widget.collectionName} has changed");
+        getData();
+      },
+    );
   }
 }

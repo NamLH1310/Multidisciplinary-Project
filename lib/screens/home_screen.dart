@@ -18,11 +18,11 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            graphColumn(const GraphDisplay(
-              dataUnit: "%",
-              dataName: "Co2",
-              collectionName: "co2_data",
-            )),
+            // graphColumn(const GraphDisplay(
+            //   dataUnit: "%",
+            //   dataName: "Co2",
+            //   collectionName: "co2_data",
+            // )),
             graphColumn(const GraphDisplay(
               dataUnit: "%",
               dataName: "Humid",
@@ -38,11 +38,11 @@ class _HomeScreenState extends State<HomeScreen> {
               dataName: "Temperature",
               collectionName: "temperature_data",
             )),
-            graphColumn(const GraphDisplay(
-              dataUnit: "%",
-              dataName: "Light",
-              collectionName: "light_data",
-            )),
+            // graphColumn(const GraphDisplay(
+            //   dataUnit: "%",
+            //   dataName: "Light",
+            //   collectionName: "light_data",
+            // )),
           ],
         ),
       ),
