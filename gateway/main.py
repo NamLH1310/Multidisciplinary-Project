@@ -232,10 +232,4 @@ def main():
         sleep(2)
 
 if __name__ == "__main__":
-    for i in range(0, 30):
-        collection_ref['co2_data'].add({
-            'createAt': datetime.now(),
-            'value': randint(250, 550),
-        })
-    exit(0)
     main()

@@ -19,7 +19,11 @@ class _DeviceSwitchListState extends State<DeviceSwitchList> {
 
   @override
   void initState() {
-    getSensors();
+    firestore.collection("sensors").snapshots().listen(
+      (event) {
+        getSensors();
+      },
+    );
     super.initState();
   }
 

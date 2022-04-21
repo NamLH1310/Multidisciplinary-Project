@@ -24,11 +24,11 @@ class _HomeScreenMobileState extends State<HomeScreenMobile> {
   Widget graphListColumn() {
     return Column(
       children: [
-        // graphColumn(const GraphDisplay(
-        //   dataUnit: "%",
-        //   dataName: "Co2",
-        //   collectionName: "co2_data",
-        // )),
+        graphColumn(const GraphDisplay(
+          dataUnit: "%",
+          dataName: "Co2",
+          collectionName: "co2_data",
+        )),
         graphColumn(const GraphDisplay(
           dataUnit: "%",
           dataName: "Humid",
@@ -44,11 +44,6 @@ class _HomeScreenMobileState extends State<HomeScreenMobile> {
           dataName: "Temperature",
           collectionName: "temperature_data",
         )),
-        // graphColumn(const GraphDisplay(
-        //   dataUnit: "%",
-        //   dataName: "Light",
-        //   collectionName: "light_data",
-        // )),
       ],
     );
   }

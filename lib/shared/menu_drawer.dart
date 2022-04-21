@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:multidisciplinary_project_se/screens/device_controller_screen.dart';
 import '../screens/home_screen.dart';
-import '../widgets/device_controller.dart';
 
 class MenuDrawer extends StatelessWidget {
   const MenuDrawer({Key? key}) : super(key: key);
