@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../screens/device_controller.dart';
+import 'package:multidisciplinary_project_se/screens/device_controller_screen.dart';
 import '../screens/home_screen.dart';
+import '../widgets/device_controller.dart';
 
 class MenuDrawer extends StatelessWidget {
   const MenuDrawer({Key? key}) : super(key: key);
@@ -43,7 +44,7 @@ class MenuDrawer extends StatelessWidget {
               screen = const HomeScreen();
               break;
             case 'Device controller':
-              screen = const DeviceController();
+              screen = const DeviceControllerScreen();
               break;
           }
           Navigator.of(context).pop();

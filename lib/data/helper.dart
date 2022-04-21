@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/global.dart';
+
 class CollectionRef {
   final String collectionName;
   final int limit;
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
   CollectionRef(this.collectionName, {this.limit = 10});
 
   Future<List<DataInput>> getData() async {

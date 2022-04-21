@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
 import '../data/helper.dart';
+import '../utils/global.dart';
 
 class GraphDisplay extends StatefulWidget {
   final String dataUnit;
@@ -22,7 +23,6 @@ class _GraphDisplayState extends State<GraphDisplay> {
   _GraphDisplayState() : super();
 
   List<DataInput> _chartData = [];
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
