@@ -39,6 +39,10 @@ class _DeviceSwitchListState extends State<DeviceSwitchList> {
           collectionName: "sensors",
           documentName: "led",
         ),
+        sensorSwitchButton(
+          collectionName: "sensors",
+          documentName: "auto",
+        ),
       ],
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
@@ -20,12 +22,10 @@ class GraphDisplay extends StatefulWidget {
 
 class _GraphDisplayState extends State<GraphDisplay> {
   _GraphDisplayState() : super();
-
-  List<DataInput> _chartData = [];
+  final _chartData = LinkedList<DataInput>();
 
   @override
   void initState() {
-    // getData();
     checkForChanges();
     super.initState();
   }
@@ -39,7 +39,7 @@ class _GraphDisplayState extends State<GraphDisplay> {
       ),
       series: <ChartSeries>[
         LineSeries<DataInput, double>(
-          dataSource: _chartData,
+          dataSource: _chartData.toList(),
           xValueMapper: (DataInput data, _) => data.x,
           yValueMapper: (DataInput data, _) => data.y,
         )
@@ -59,19 +59,25 @@ class _GraphDisplayState extends State<GraphDisplay> {
 
   getData() async {
     try {
-      _chartData =
-          await CollectionRef(widget.collectionName, limit: 20).getData();
+      var datas = await CollectionRef(widget.collectionName).getData(limit: 20);
+      _chartData.clear();
+      _chartData.addAll(datas);
       setState(() {});
     } catch (error) {
       debugPrint("$error");
     }
   }
 
-  checkForChanges() async {
+  checkForChanges() {
     firestore.collection(widget.collectionName).snapshots().listen(
-      (event) {
+      (event) async {
         debugPrint("${widget.collectionName} has changed");
         getData();
+        // final latestData =
+        //     await CollectionRef(widget.collectionName).getLatestData();
+        // _chartData.remove(_chartData.last);
+        // _chartData.addFirst(latestData);
+        setState(() {});
       },
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../shared/menu_drawer.dart';
+import '../widgets/device_progress_bar.dart';
 import '../widgets/graph.dart';
 
 class HomeScreenMobile extends StatefulWidget {
@@ -44,6 +45,15 @@ class _HomeScreenMobileState extends State<HomeScreenMobile> {
           dataName: "Temperature",
           collectionName: "temperature_data",
         )),
+        const DeviceProgressBar(
+          min: 0,
+          max: 100,
+          collectionName: "",
+          thresholds: [
+            40,
+            60,
+          ],
+        ),
       ],
     );
   }
